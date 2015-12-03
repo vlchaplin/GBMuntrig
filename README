@@ -1,0 +1,97 @@
+****************************************************** 
+* GBMUnTrig
+* Create Trigdat data from continuous, aka "daily", CTIME and POSHIST files.
+* By Vandiver Chaplin (chapliv@uah.edu)
+*
+* This document updated: 20 March 2013
+******************************************************
+
+---------------------------
+USAGE
+---------------------------
+At runtime make sure the libcfitiso is in your dynamic linker path (DYLD_LIBRARY_PATH on
+Mac OS, LD_LIBRARY_PATH Linux).
+
+`gbmCont2Untrig` can be run from any directory, so add <prefix>/bin to your PATH to do this.
+
+A time argument specifying the time of the un-triggered event must be given.  From this
+the 'yymmddfff' string is determined.  There are options for MET, MJD, and UTC.
+
+Data files must be given explicitly, using the '-ctime' and '-ph' arguments.
+It requires CTIME data for at least all 12 NAIs, but BGOs can be included for completeness.
+The poshist file for that day is also required.  Files do NOT have to be in the current
+working directory, so long as the full path name is given.
+
+The '-alg' argument is required to allow some degree of history as to which search program
+or algorithm found the event.  It should be a short informative string, such as the
+name+version of the search program.  The value is written into the USER_ALG keyword.
+
+When successfully run, an RMFIT-compatible trigdat file is generated in the working directory.
+
+`gbmCont2Untrig --help` for usage information
+
+****  Issues with SAA outages ****
+If there's an SAA passage during your time selection, it will likely cause an error on the first attempt.  
+To deal with SAA passages, you can either find its time bounds and limit your selection to avoid it,
+or make sure to include some data before and after the SAA.  This can be done using -pre and -post arguments,
+and choosing a different T0 (given in the -met, -mjd, or -utc argument).
+
+
+
+The file 'untrigdat.txt' is required to make a new untrig file from scratch. 
+It is installed and its path is hardcoded at compile time.
+
+-------------------------------- 
+INSTALLATION 
+-------------------------------- 
+Compiling the program requires a 4.x GNU C++ compiler (gcc/g++). The configure/make
+scripts are generated with GNU 'autotools' and work like GNU packages.
+
+The CFITSIO library and header file "fitsio.h" is required.  This can be installed either
+as a standalone library or as part of the HEASoft package.
+
+http://heasarc.gsfc.nasa.gov/docs/software/fitsio/fitsio.html      (C library only)
+http://heasarc.gsfc.nasa.gov/docs/software/lheasoft                (HEASoft)
+
+Once installed their location on your system can be specified in one of the following
+ways: (If the C library is installed into /usr/local, these aren't necessary)
+
+--> Set the HEADAS environment variable set to the root directory containing include/fitsio.h
+and lib/libcfitsio.dylib (.lo, .a, etc.).  This probably already set if HEASoft was installed.
+
+OR -->  `./configure --with-cfitsio=<...>`     or    `--with-heasoft=<...>` 
+
+OR -->  `./configure 	\
+				--with-cfitsio-include=<path to fitsio.h> \
+				--with-cfitsio-lib=<path to libcfitsio.*> `
+
+(NOTE:  Make sure a symbolic link points from libcfitsio.* to libcfistio_<version>.*)
+
+Then run configure with --prefix set to the desired install location (default is /usr/local/GBMUnTrig):
+
+./configure --prefix=<prefix>  ... 
+make 
+make install  (or sudo make install if <prefix> is restricted)
+
+
+`./configure --help` for a complete list of options
+
+
+Installed files: 
+---------------- 
+<prefix>/bin/gbmCont2Untrig
+<prefix>/fits_template/untrigdat.txt
+
+* Don't move the untrigdat.txt file after installation.  The full path is compiled into
+the executable. The only way to "move" the installation is to recompile with a different
+<prefix>.
+
+
+make uninstall
+to delete the above files (but the directories <prefix>/bin and <prefix>/fits_template
+have to be manually removed).
+
+
+
+
+
